@@ -3,7 +3,12 @@ guid: 5ded3e960aca3ec4ab4c0bddc03f3a34
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - playerPrefab: {fileID: 7492446296130313318, guid: e68f16fbb11cd174c8eb5188e41185af, type: 3}
+  - boxPrefab: {fileID: 3538428230070736147, guid: e30aead94b5af3f4686058079a371a7b, type: 3}
+  - clearText: {instanceID: 0}
+  - goalPrefab: {fileID: 7809606354115323656, guid: a225b054ebbfafa42889a1d78cba0fd7, type: 3}
+  - ParticlePrefab: {fileID: 3220877991350402254, guid: db83cea49b8b6b54c8e760b3813ba1df, type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
