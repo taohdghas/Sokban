@@ -12,6 +12,7 @@ public class GameManagerScript : MonoBehaviour
     public GameObject clearText;
     public GameObject goalPrefab;
     public GameObject ParticlePrefab;
+    public GameObject wallPrefab;
     //�z��̐錾
     int[,] map;
     GameObject[,] field;
@@ -21,12 +22,13 @@ public class GameManagerScript : MonoBehaviour
         Screen.SetResolution(1280, 720, false);
         //�}�b�v�̐���
         map = new int[,]
-   {
-        {0,0,0,0,0 },
-        {0,3,1,3,0 },
-        {0,0,2,0,0 },
-        {0,2,3,2,0 },
-        {0,0,0,0,0 },
+   {    {4,4,4,4,4,4,4,4,4},
+        {4,0,0,0,0,0,0,0,4},
+        {4,0,0,3,1,3,0,0,4},
+        {4,0,0,4,2,0,0,0,4},
+        {4,0,0,2,3,2,0,0,4},
+        {4,0,0,0,0,0,0,0,4},
+        {4,4,4,4,4,4,4,4,4},
     };
         //�t�B�[���h�T�C�Y����
         field = new GameObject[
@@ -54,6 +56,11 @@ public class GameManagerScript : MonoBehaviour
                 {
                     field[y, x] = Instantiate(
                        goalPrefab, new Vector3(x, map.GetLength(0) - y, 0.01f), Quaternion.identity);
+                }
+                if (map[y, x] == 4)
+                {
+                    field[y, x] = Instantiate(
+                       wallPrefab, new Vector3(x, map.GetLength(0) - y, 0.01f), Quaternion.identity);
                 }
             }
             debugText += "\n";
@@ -135,10 +142,14 @@ public class GameManagerScript : MonoBehaviour
 
     bool MoveNumber(Vector2Int moveFrom, Vector2Int moveTo)
     {
-        //�ړ��\�����f
+        // 移動先がフィールドの外なら移動できない
         if (moveTo.y < 0 || moveTo.y >= field.GetLength(0)) { return false; }
         if (moveTo.x < 0 || moveTo.x >= field.GetLength(1)) { return false; }
 
+        // 移動先が壁（Wall）なら移動できない
+        if (field[moveTo.y, moveTo.x] != null && field[moveTo.y, moveTo.x].tag == "Wall") { return false; }
+
+        // 移動先に箱（Box）がある場合、その箱を同じ方向に移動させる
         if (field[moveTo.y, moveTo.x] != null && field[moveTo.y, moveTo.x].tag == "Box")
         {
             Vector2Int velocity = moveTo - moveFrom;
@@ -146,25 +157,22 @@ public class GameManagerScript : MonoBehaviour
             if (!success) { return false; }
         }
 
-        //�v���C���[�E���ς�炸�̈ړ�����
+        // プレイヤーを移動先に移動させる
         field[moveTo.y, moveTo.x] = field[moveFrom.y, moveFrom.x];
-        Vector3 moveToPosition = new Vector3(
-          moveTo.x, map.GetLength(0) - moveTo.y, 0);
+        Vector3 moveToPosition = new Vector3(moveTo.x, map.GetLength(0) - moveTo.y, 0);
         field[moveFrom.y, moveFrom.x].GetComponent<Move>().MoveTo(moveToPosition);
         field[moveFrom.y, moveFrom.x] = null;
 
-        //�p�[�e�B�N��
-
+        // パーティクルの生成
         const float num = 3;
         for (int i = 0; i < num; i++)
         {
-            Particle.Instantiate(
-                ParticlePrefab, new Vector3(moveFrom.x, map.GetLength(0) - moveFrom.y, 0),
-                Quaternion.identity);
+            Particle.Instantiate(ParticlePrefab, new Vector3(moveFrom.x, map.GetLength(0) - moveFrom.y, 0), Quaternion.identity);
         }
 
         return true;
     }
+
 
     bool IsCleard()
     {
